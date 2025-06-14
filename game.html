@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Chopsticks Game Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        // Redirect to index.html on page refresh
+        if (performance.navigation.type === 1) {
+            window.location.href = 'index.html';
+        }
+    </script>
+</head>
+<body class="light-theme">
+    <div class="game-container">
+        <header class="game-header">
+            <div class="header-left">
+                <button id="sidebar-toggle" class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Chopsticks Pro</h1>
+            </div>
+            <div class="header-right">
+                <button id="theme-toggle" class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="reset-btn" class="reset-btn">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+                <a href="index.html" class="home-link">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+        </header>
+
+        <div class="game-board">
+            <div class="player-section opponent-section">
+                <div class="player-info">
+                    <div class="player-avatar">
+                        <i id="opponent-avatar" class="fas fa-robot"></i>
+                    </div>
+                    <div class="player-name">
+                        <h2 id="opponent-name">Computer</h2>
+                    </div>
+                </div>
+                <div class="hands-container">
+                    <div class="hand opponent-hand" id="opponent-left" data-hand="left">
+                        <div class="fingers" id="opponent-left-fingers">👆</div>
+                        <div class="finger-count">1</div>
+                    </div>
+                    <div class="hand opponent-hand" id="opponent-right" data-hand="right">
+                        <div class="fingers" id="opponent-right-fingers">👆</div>
+                        <div class="finger-count">1</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-status-container">
+                <div class="game-status-wrapper">
+                    <div id="mode-info" class="mode-info">Playing against Computer</div>
+                    <div id="current-turn" class="current-turn">Your Turn</div>
+                    <div id="game-status" class="game-status">Select your hand, then tap computer's hand or split</div>
+                </div>
+                <div class="action-buttons">
+                    <button id="split-btn" class="action-btn split-btn" disabled>
+                        <i class="fas fa-cut"></i> Split Fingers
+                    </button>
+                    <button id="split-btn-p2" class="action-btn split-btn" style="display: none;">
+                        <i class="fas fa-cut"></i> Player 2 Split
+                    </button>
+                </div>
+            </div>
+
+            <div class="player-section player1-section">
+                <div class="hands-container">
+                    <div class="hand player-hand" id="player-left" data-hand="left">
+                        <div class="fingers" id="player-left-fingers">👆</div>
+                        <div class="finger-count">1</div>
+                    </div>
+                    <div class="hand player-hand" id="player-right" data-hand="right">
+                        <div class="fingers" id="player-right-fingers">👆</div>
+                        <div class="finger-count">1</div>
+                    </div>
+                </div>
+                <div class="player-info">
+                    <div class="player-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="player-name">
+                        <h2>Player 1</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-effects" id="game-effects"></div>
+
+        <div class="instructions-container">
+            <button id="instructions-toggle" class="instructions-toggle">
+                <i class="fas fa-question-circle"></i>
+            </button>
+            <div class="instructions-content">
+                <h3>Quick Help</h3>
+                <ul>
+                    <li><strong>Attack:</strong> Select your hand, then tap opponent's hand</li>
+                    <li><strong>Split:</strong> Click the Split button to redistribute fingers</li>
+                    <li><strong>Win:</strong> Force both of your opponent's hands to 5 fingers</li>
+                </ul>
+                <div class="keyboard-shortcuts">
+                    <h4>Keyboard Shortcuts</h4>
+                    <div class="shortcut"><span>R</span> Reset Game</div>
+                    <div class="shortcut"><span>S</span> Split Fingers</div>
+                    <div class="shortcut"><span>H</span> Show History</div>
+                    <div class="shortcut"><span>ESC</span> Close Sidebar</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>Game History</h2>
+            <button id="close-sidebar" class="close-sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="sidebar-content">
+            <div class="game-stats">
+                <h3>Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="games-played">0</div>
+                        <div class="stat-label">Games</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="player-wins">0</div>
+                        <div class="stat-label">Wins</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="player-losses">0</div>
+                        <div class="stat-label">Losses</div>
+                    </div>
+                </div>
+            </div>
+            <div class="game-modes">
+                <h3>Game Mode</h3>
+                <div class="mode-buttons">
+                    <button class="mode-btn active" data-mode="computer">
+                        <i class="fas fa-robot"></i> Computer
+                    </button>
+                    <button class="mode-btn" data-mode="friend">
+                        <i class="fas fa-user-friends"></i> Friend
+                    </button>
+                </div>
+            </div>
+            <div class="game-logs">
+                <div class="logs-header">
+                    <h3>Move History</h3>
+                    <button id="clear-logs" class="clear-logs">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div id="logs-list" class="logs-list">
+                    <div class="log-item welcome">No moves yet. Start playing!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

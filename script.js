@@ -1068,18 +1068,14 @@ class SoundManager {
 
 // Initialize the game when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if we're on the home page
-    if (document.querySelector('.home-container')) {
-        // Home page is handled by its own script
-        return;
-    }
-    
     // Initialize sound manager
     const soundManager = new SoundManager();
     soundManager.loadSounds();
     
-    // Initialize game
+    // Initialize game with the selected mode from localStorage
+    const gameMode = localStorage.getItem('gameMode') || 'computer';
     const game = new ChopsticksGamePro(soundManager);
+    game.switchGameMode(gameMode);
     
     // Add sound toggle button to the header
     const headerRight = document.querySelector('.header-right');

@@ -202,8 +202,6 @@ body {
     visibility: visible;
 }
 
-
-
 /* Main Content */
 .main-content {
     transition: margin-left 0.3s ease;
@@ -323,6 +321,9 @@ body {
     max-width: 900px;
     margin: 0 auto;
     padding: 30px 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .game-info {
@@ -500,10 +501,23 @@ body {
 
 /* Game Board */
 .game-board {
-    margin: 40px 0;
-    padding: 30px;
+    margin: 0;
+    padding: 20px;
     text-align: center;
     position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.game-status-container {
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.game-status-wrapper {
+    margin-bottom: 15px;
 }
 
 .action-buttons {
@@ -511,7 +525,7 @@ body {
     justify-content: center;
     gap: 20px;
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin: 10px 0;
 }
 
 .action-btn {
@@ -568,38 +582,45 @@ body {
     z-index: 10;
 }
 
-/* Instructions Panel */
-.instructions-panel {
-    background: var(--secondary-bg);
-    border-radius: 15px;
-    margin-top: 30px;
-    box-shadow: 0 4px 20px var(--shadow);
-    border: 1px solid var(--border-color);
-    overflow: hidden;
+/* Instructions Container */
+.instructions-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
 }
 
 .instructions-toggle {
-    width: 100%;
-    padding: 20px;
-    background: var(--accent-bg);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--info-color);
+    color: white;
     border: none;
-    color: var(--text-primary);
-    font-size: 1.1em;
-    font-weight: bold;
+    font-size: 1.5em;
     cursor: pointer;
-    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    box-shadow: 0 4px 15px var(--shadow);
+    transition: all 0.3s ease;
 }
 
 .instructions-toggle:hover {
-    background: var(--border-color);
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(66, 153, 225, 0.4);
 }
 
 .instructions-content {
-    padding: 25px;
+    position: absolute;
+    bottom: 60px;
+    right: 0;
+    width: 300px;
+    background: var(--secondary-bg);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 8px 25px var(--shadow);
+    border: 1px solid var(--border-color);
     display: none;
 }
 
@@ -607,41 +628,47 @@ body {
     display: block;
 }
 
-.instruction-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-}
-
-.instruction-card {
-    text-align: center;
-    padding: 20px;
-    background: var(--accent-bg);
-    border-radius: 12px;
-    transition: all 0.3s ease;
-}
-
-.instruction-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px var(--shadow);
-}
-
-.instruction-card i {
-    font-size: 2em;
-    color: var(--info-color);
+.instructions-content h3 {
     margin-bottom: 15px;
-}
-
-.instruction-card h4 {
     color: var(--text-primary);
-    margin-bottom: 10px;
-    font-size: 1.1em;
 }
 
-.instruction-card p {
+.instructions-content ul {
+    list-style-type: none;
+    margin-bottom: 20px;
+}
+
+.instructions-content li {
+    margin-bottom: 10px;
     color: var(--text-secondary);
-    font-size: 0.9em;
-    line-height: 1.4;
+}
+
+.keyboard-shortcuts {
+    background: var(--accent-bg);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.keyboard-shortcuts h4 {
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+.shortcut {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+}
+
+.shortcut span {
+    background: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 3px 8px;
+    margin-right: 10px;
+    font-weight: bold;
+    color: var(--text-primary);
 }
 
 /* Animations */
@@ -682,91 +709,274 @@ body {
     pointer-events: none;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .game-header {
-        padding: 10px 15px;
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .header-left, .header-right {
-        width: 100%;
+/* Responsive Design for different aspect ratios */
+/* Portrait orientation (mobile phones, 9:16) */
+@media (max-width: 480px) and (orientation: portrait) {
+    .game-container {
+        padding: 10px;
         justify-content: space-between;
     }
     
+    .game-header {
+        padding: 10px;
+    }
+    
+    .header-left, .header-right {
+        gap: 10px;
+    }
+    
     .game-header h1 {
-        font-size: 1.5em;
+        font-size: 1.3em;
     }
     
-    .game-mode-selector {
-        flex: 1;
-        justify-content: center;
+    .home-link {
+        display: none;
     }
     
-    .game-container {
-        padding: 20px 15px;
+    .game-board {
+        padding: 10px 0;
+    }
+    
+    .player-section {
+        padding: 15px;
+        margin: 10px 0;
     }
     
     .hands-container {
-        gap: 20px;
+        gap: 15px;
     }
     
     .hand {
-        min-width: 110px;
-        padding: 20px;
+        padding: 15px;
+        min-width: 100px;
     }
     
     .fingers {
         font-size: 1.8em;
-        min-height: 60px;
-        gap: 6px;
+        min-height: 50px;
+    }
+    
+    .finger-count {
+        width: 35px;
+        height: 35px;
+        font-size: 1.3em;
+    }
+    
+    .player-info {
+        margin-bottom: 10px;
+    }
+    
+    .player-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2em;
+    }
+    
+    .player-info h2 {
+        font-size: 1.2em;
+    }
+    
+    .game-status-container {
+        padding: 10px 0;
+    }
+    
+    .action-btn {
+        padding: 10px 20px;
+        font-size: 1em;
+        min-width: 120px;
+    }
+    
+    .instructions-container {
+        bottom: 10px;
+        right: 10px;
+    }
+    
+    .instructions-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2em;
+    }
+    
+    .instructions-content {
+        width: 250px;
+        padding: 15px;
+        bottom: 50px;
+    }
+}
+
+/* Landscape orientation (mobile phones, 16:9) */
+@media (max-height: 480px) and (orientation: landscape) {
+    .game-container {
+        padding: 5px;
+    }
+    
+    .game-header {
+        padding: 5px 10px;
+    }
+    
+    .game-header h1 {
+        font-size: 1.2em;
+    }
+    
+    .game-board {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px;
+    }
+    
+    .opponent-section, .player1-section {
+        width: 40%;
+        margin: 0;
+        padding: 10px;
+    }
+    
+    .game-status-container {
+        width: 20%;
+        padding: 5px;
+    }
+    
+    .hands-container {
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    .hand {
+        padding: 10px;
+        min-width: 80px;
+    }
+    
+    .fingers {
+        font-size: 1.5em;
+        min-height: 40px;
+        margin: 5px 0;
+    }
+    
+    .finger-count {
+        width: 30px;
+        height: 30px;
+        font-size: 1.1em;
+        margin: 5px auto 0;
+    }
+    
+    .player-info {
+        margin-bottom: 5px;
+    }
+    
+    .player-avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 1em;
+    }
+    
+    .player-info h2 {
+        font-size: 1em;
     }
     
     .action-buttons {
         flex-direction: column;
-        align-items: center;
+        gap: 5px;
     }
     
-    .instruction-grid {
-        grid-template-columns: 1fr;
+    .action-btn {
+        padding: 8px 15px;
+        font-size: 0.9em;
+        min-width: 100px;
     }
     
-    .sidebar {
-        width: 300px;
-        left: -300px;
+    .instructions-container {
+        bottom: 5px;
+        right: 5px;
+    }
+    
+    .instructions-toggle {
+        width: 35px;
+        height: 35px;
+        font-size: 1em;
     }
 }
 
-@media (max-width: 480px) {
-    .hands-container {
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
+/* Tablet portrait (3:4) */
+@media (min-width: 481px) and (max-width: 768px) and (orientation: portrait) {
+    .game-container {
+        padding: 15px;
     }
     
-    .player-info {
-        flex-direction: column;
-        gap: 10px;
+    .game-board {
+        padding: 15px 0;
     }
     
-    .game-info {
+    .player-section {
+        padding: 20px;
+        margin: 15px 0;
+    }
+    
+    .hand {
+        min-width: 120px;
         padding: 20px;
     }
     
-    .turn-indicator {
-        font-size: 1.3em;
+    .fingers {
+        font-size: 2em;
+        min-height: 60px;
+    }
+}
+
+/* Tablet landscape (4:3) */
+@media (min-width: 481px) and (max-width: 1024px) and (orientation: landscape) {
+    .game-container {
+        padding: 15px;
+    }
+    
+    .game-board {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        align-items: center;
+    }
+    
+    .opponent-section, .player1-section {
+        width: 45%;
+        margin: 10px 0;
+    }
+    
+    .game-status-container {
+        width: 100%;
+        order: -1;
+        margin-bottom: 15px;
+    }
+    
+    .action-buttons {
+        flex-direction: row;
+    }
+}
+
+/* Desktop (16:9) */
+@media (min-width: 1025px) {
+    .game-container {
+        max-width: 1200px;
+    }
+    
+    .game-board {
+        padding: 30px;
+    }
+    
+    .hand {
+        min-width: 160px;
+        padding: 30px;
     }
     
     .fingers {
-        font-size: 1.6em;
-        min-height: 50px;
-        gap: 4px;
+        font-size: 2.5em;
+        min-height: 80px;
     }
     
-    .sidebar {
-        width: 280px;
-        left: -280px;
+    .finger-count {
+        width: 50px;
+        height: 50px;
+        font-size: 1.8em;
     }
 }
 
@@ -804,4 +1014,53 @@ body {
 
 .logs-list::-webkit-scrollbar-thumb:hover {
     background: var(--text-muted);
+}
+
+/* Home screen responsive adjustments */
+@media (max-width: 480px) {
+    .home-container {
+        padding: 30px 15px;
+    }
+    
+    .game-logo i {
+        font-size: 3rem;
+    }
+    
+    .game-logo h1 {
+        font-size: 2rem;
+    }
+    
+    .game-logo p {
+        font-size: 1rem;
+        margin-bottom: 30px;
+    }
+    
+    .menu-btn {
+        padding: 12px 20px;
+        font-size: 1rem;
+    }
+    
+    .settings-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .rules-content {
+        padding: 20px;
+    }
+}
+
+/* Orientation change handling */
+@media screen and (orientation: portrait) {
+    .game-board {
+        flex-direction: column;
+    }
+}
+
+@media screen and (orientation: landscape) {
+    .game-board {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
 }
