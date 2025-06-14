@@ -1,0 +1,10 @@
+This is a placeholder file for the sounds directory.
+Add your sound files here:
+
+Suggested sound files:
+- click.mp3: For button clicks
+- start.mp3: For starting the game
+- attack.mp3: For attack moves
+- split.mp3: For split moves
+- win.mp3: For winning the game
+- lose.mp3: For losing the game
