@@ -16,6 +16,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Sound management
     const buttonSound = new Audio('./sounds/button.wav');
     
+    // Preload the button sound
+    buttonSound.load();
+    
+    // Add event listeners for debugging
+    buttonSound.addEventListener('canplaythrough', () => {
+        console.log('Button sound loaded successfully');
+    });
+    
+    buttonSound.addEventListener('error', (e) => {
+        console.error('Error loading button sound:', e);
+    });
+    
     // Function to check if sound is enabled (real-time check)
     function isSoundEnabled() {
         return localStorage.getItem('soundEnabled') !== 'false';
@@ -26,10 +38,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to play sound and then navigate
     function playAndNavigate(url, delay = 300) {
         if (isSoundEnabled()) {
-            buttonSound.play();
-            setTimeout(() => {
-                window.location.href = url;
-            }, delay);
+            buttonSound.currentTime = 0;
+            const playPromise = buttonSound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    setTimeout(() => {
+                        window.location.href = url;
+                    }, delay);
+                }).catch(err => {
+                    console.error('Error playing button sound:', err);
+                    window.location.href = url;
+                });
+            } else {
+                setTimeout(() => {
+                    window.location.href = url;
+                }, delay);
+            }
         } else {
             window.location.href = url;
         }
@@ -38,11 +63,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Start Game button - show mode selection screen
     startGameBtn.addEventListener('click', function() {
         if (isSoundEnabled()) {
-            buttonSound.play();
-            setTimeout(() => {
-                homeScreen.style.display = 'none';
-                modeScreen.style.display = 'flex';
-            }, 300);
+            buttonSound.currentTime = 0;
+            const playPromise = buttonSound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    setTimeout(() => {
+                        homeScreen.style.display = 'none';
+                        modeScreen.style.display = 'flex';
+                    }, 300);
+                }).catch(err => {
+                    console.error('Error playing button sound:', err);
+                    homeScreen.style.display = 'none';
+                    modeScreen.style.display = 'flex';
+                });
+            } else {
+                setTimeout(() => {
+                    homeScreen.style.display = 'none';
+                    modeScreen.style.display = 'flex';
+                }, 300);
+            }
         } else {
             homeScreen.style.display = 'none';
             modeScreen.style.display = 'flex';
@@ -51,24 +91,69 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Show Rules button
     showRulesBtn.addEventListener('click', function() {
-        if (isSoundEnabled()) buttonSound.play();
-        rulesModal.style.display = 'flex';
+        if (isSoundEnabled()) {
+            buttonSound.currentTime = 0;
+            const playPromise = buttonSound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    rulesModal.style.display = 'flex';
+                }).catch(err => {
+                    console.error('Error playing button sound:', err);
+                    rulesModal.style.display = 'flex';
+                });
+            } else {
+                rulesModal.style.display = 'flex';
+            }
+        } else {
+            rulesModal.style.display = 'flex';
+        }
     });
     
     // Close Rules button
     closeRulesBtn.addEventListener('click', function() {
-        if (isSoundEnabled()) buttonSound.play();
-        rulesModal.style.display = 'none';
+        if (isSoundEnabled()) {
+            buttonSound.currentTime = 0;
+            const playPromise = buttonSound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    rulesModal.style.display = 'none';
+                }).catch(err => {
+                    console.error('Error playing button sound:', err);
+                    rulesModal.style.display = 'none';
+                });
+            } else {
+                rulesModal.style.display = 'none';
+            }
+        } else {
+            rulesModal.style.display = 'none';
+        }
     });
     
     // Back to Home button
     backToHomeBtn.addEventListener('click', function() {
         if (isSoundEnabled()) {
-            buttonSound.play();
-            setTimeout(() => {
-                modeScreen.style.display = 'none';
-                homeScreen.style.display = 'flex';
-            }, 300);
+            buttonSound.currentTime = 0;
+            const playPromise = buttonSound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    setTimeout(() => {
+                        modeScreen.style.display = 'none';
+                        homeScreen.style.display = 'flex';
+                    }, 300);
+                }).catch(err => {
+                    console.error('Error playing button sound:', err);
+                    modeScreen.style.display = 'none';
+                    homeScreen.style.display = 'flex';
+                });
+            } else {
+                setTimeout(() => {
+                    modeScreen.style.display = 'none';
+                    homeScreen.style.display = 'flex';
+                }, 300);
+            }
         } else {
             modeScreen.style.display = 'none';
             homeScreen.style.display = 'flex';
@@ -78,13 +163,53 @@ document.addEventListener('DOMContentLoaded', function() {
     // VS Computer button
     vsComputerBtn.addEventListener('click', function() {
         localStorage.setItem('gameMode', 'computer');
-        playAndNavigate('game.html');
+        // Make sure button sound plays and completes before navigating
+        if (isSoundEnabled()) {
+            buttonSound.currentTime = 0;
+            const playPromise = buttonSound.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    setTimeout(() => {
+                        window.location.href = 'game.html';
+                    }, 300);
+                }).catch(err => {
+                    console.error('Error playing button sound:', err);
+                    window.location.href = 'game.html';
+                });
+            } else {
+                setTimeout(() => {
+                    window.location.href = 'game.html';
+                }, 300);
+            }
+        } else {
+            window.location.href = 'game.html';
+        }
     });
     
     // VS Friend button
     vsFriendBtn.addEventListener('click', function() {
         localStorage.setItem('gameMode', 'friend');
-        playAndNavigate('game.html');
+        // Make sure button sound plays and completes before navigating
+        if (isSoundEnabled()) {
+            buttonSound.currentTime = 0;
+            const playPromise = buttonSound.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    setTimeout(() => {
+                        window.location.href = 'game.html';
+                    }, 300);
+                }).catch(err => {
+                    console.error('Error playing button sound:', err);
+                    window.location.href = 'game.html';
+                });
+            } else {
+                setTimeout(() => {
+                    window.location.href = 'game.html';
+                }, 300);
+            }
+        } else {
+            window.location.href = 'game.html';
+        }
     });
     
     // Sound toggle
@@ -99,13 +224,33 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Theme toggle
     homeThemeToggle.addEventListener('click', function() {
-        // Play sound if enabled
-        if (isSoundEnabled()) buttonSound.play();
-        
-        // Toggle theme
+        // Get current theme
         const currentTheme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         
+        // Play sound if enabled
+        if (isSoundEnabled()) {
+            buttonSound.currentTime = 0;
+            const playPromise = buttonSound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    // Apply theme changes after sound plays
+                    applyThemeChange(newTheme);
+                }).catch(err => {
+                    console.error('Error playing button sound:', err);
+                    applyThemeChange(newTheme);
+                });
+            } else {
+                applyThemeChange(newTheme);
+            }
+        } else {
+            applyThemeChange(newTheme);
+        }
+    });
+    
+    // Helper function to apply theme changes
+    function applyThemeChange(newTheme) {
         // Apply theme to both body and html elements
         document.body.className = `${newTheme}-theme`;
         document.documentElement.className = `${newTheme}-theme`;
@@ -117,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
         homeThemeToggle.innerHTML = `<i class="fas ${newTheme === 'dark' ? 'fa-sun' : 'fa-moon'}"></i>`;
         
         console.log(`Theme changed to: ${newTheme}`);
-    });
+    }
     
     // Load saved theme
     const savedTheme = localStorage.getItem('theme') || 'light';
