@@ -18,7 +18,7 @@ class ChopsticksGamePro {
             playerLosses: parseInt(localStorage.getItem('playerLosses') || '0')
         };
         
-        this.fingerEmojis = ['💀', '👆', '✌️', '🤟', '🖖', '✋'];
+        this.fingerEmoji = '👆';
         this.logs = [];
         
         this.initializeGame();
@@ -117,9 +117,11 @@ class ChopsticksGamePro {
 
     // Game Mode Management
     switchGameMode(mode) {
+        // Game mode buttons are now disabled in the UI
         if (this.gameState.gameMode === mode) return;
         
         this.gameState.gameMode = mode;
+        localStorage.setItem('gameMode', mode);
         
         // Update UI
         document.querySelectorAll('.mode-btn').forEach(btn => {
@@ -132,10 +134,14 @@ class ChopsticksGamePro {
         
         if (mode === 'friend') {
             splitBtn1.innerHTML = '<i class="fas fa-cut"></i> Player 1 Split';
-            splitBtn2.style.display = 'inline-flex';
+            if (splitBtn2) {
+                splitBtn2.style.display = 'inline-flex';
+            }
         } else {
             splitBtn1.innerHTML = '<i class="fas fa-cut"></i> Split Fingers';
-            splitBtn2.style.display = 'none';
+            if (splitBtn2) {
+                splitBtn2.style.display = 'none';
+            }
         }
         
         // Update opponent info
@@ -231,6 +237,11 @@ class ChopsticksGamePro {
         
         // Check if hand is dead
         if (this.gameState.player[handSide] === 5) return;
+        
+        // Play hand sound when player touches their hand - only in active game
+        if (this.soundManager && !this.gameState.gameOver) {
+            this.soundManager.play('hand');
+        }
 
         // Toggle selection
         if (this.gameState.selectedHand === handSide) {
@@ -259,6 +270,11 @@ class ChopsticksGamePro {
             // Check if target hand is dead
             if (this.gameState.player[targetHand] === 5) return;
             
+            // Play hand sound when player 2 attacks player 1's hand - only when actually performing an attack
+            if (this.soundManager) {
+                this.soundManager.play('hand');
+            }
+            
             this.performAttack('opponent', this.gameState.selectedHand, 'player', targetHand);
         }
     }
@@ -272,6 +288,12 @@ class ChopsticksGamePro {
                 // Player 1 attacking Player 2's hand
                 const targetHand = e.currentTarget.dataset.hand;
                 if (this.gameState.opponent[targetHand] === 5) return;
+                
+                // Play hand sound when player 1 attacks player 2's hand
+                if (this.soundManager) {
+                    this.soundManager.play('hand');
+                }
+                
                 this.performAttack('player', this.gameState.selectedHand, 'opponent', targetHand);
             } else if (this.gameState.currentTurn === 'opponent') {
                 // Player 2 selecting their hand
@@ -279,6 +301,11 @@ class ChopsticksGamePro {
                 const handSide = hand.dataset.hand;
                 
                 if (this.gameState.opponent[handSide] === 5) return;
+                
+                // Play hand sound when player 2 selects their hand
+                if (this.soundManager) {
+                    this.soundManager.play('hand');
+                }
 
                 // Toggle selection for Player 2
                 if (this.gameState.selectedHand === handSide) {
@@ -298,6 +325,11 @@ class ChopsticksGamePro {
             const targetHand = e.currentTarget.dataset.hand;
             if (this.gameState.opponent[targetHand] === 5) return;
             
+            // Play hand sound when player attacks computer's hand
+            if (this.soundManager) {
+                this.soundManager.play('hand');
+            }
+            
             this.performAttack('player', this.gameState.selectedHand, 'opponent', targetHand);
         }
     }
@@ -309,9 +341,14 @@ class ChopsticksGamePro {
         // Calculate new finger count with rollover
         let newFingers = (attackerFingers + targetFingers) % 5;
         if (newFingers === 0) newFingers = 5;
+        
+        // Check if this attack will kill the hand
+        const willKillHand = newFingers === 5 && targetFingers !== 5;
 
         this.gameState[targetPlayer][targetHand] = newFingers;
         this.gameState.moveCount++;
+        
+        // We'll play the dead sound in updateHandDisplay instead
 
         // Log the move
         const attackerName = attackerPlayer === 'player' ? 'Player 1' : 
@@ -366,18 +403,24 @@ class ChopsticksGamePro {
         let splitPerformed = false;
         let newLeft = leftFingers;
         let newRight = rightFingers;
+        let handRecovered = false;
+        
+        // Check if this split will recover a dead hand
+        const willRecoverHand = (leftFingers === 5 && rightFingers > 0) || (rightFingers === 5 && leftFingers > 0);
         
         // Case 1: Left hand is dead, right hand has fingers
         if (leftFingers === 5 && rightFingers > 0) {
             newLeft = 1;
             newRight = rightFingers - 1;
             splitPerformed = true;
+            handRecovered = true;
         }
         // Case 2: Right hand is dead, left hand has fingers
         else if (rightFingers === 5 && leftFingers > 0) {
             newRight = 1;
             newLeft = leftFingers - 1;
             splitPerformed = true;
+            handRecovered = true;
         }
         // Case 3: Both hands have fingers, redistribute
         else if (leftFingers > 0 && rightFingers > 0) {
@@ -408,6 +451,11 @@ class ChopsticksGamePro {
             this.gameState.player.right = newRight;
             
             this.addLog(`Player 1 split: ${leftFingers}-${rightFingers} → ${newLeft}-${newRight}`, 'player-move');
+            
+            // Show recover hand effect if a hand was recovered
+            if (willRecoverHand) {
+                this.createRecoverHandEffect('player');
+            }
             
             this.gameState.moveCount++;
             this.updateDisplay();
@@ -441,18 +489,32 @@ class ChopsticksGamePro {
         let splitPerformed = false;
         let newLeft = leftFingers;
         let newRight = rightFingers;
+        let handRecovered = false;
+        
+        // Check if this split will recover a dead hand
+        const willRecoverHand = (leftFingers === 5 && rightFingers > 0) || (rightFingers === 5 && leftFingers > 0);
+        
+        // Special case: Can't split when one hand is dead and the other has exactly 1 finger
+        const deadHandWithOneFinger = (leftFingers === 5 && rightFingers === 1) || 
+                                     (rightFingers === 5 && leftFingers === 1);
+        
+        if (deadHandWithOneFinger || leftFingers + rightFingers <= 1) {
+            return; // Can't split in these cases
+        }
         
         // Case 1: Left hand is dead, right hand has fingers
-        if (leftFingers === 5 && rightFingers > 0) {
+        if (leftFingers === 5 && rightFingers > 1) {
             newLeft = 1;
             newRight = rightFingers - 1;
             splitPerformed = true;
+            handRecovered = true;
         }
         // Case 2: Right hand is dead, left hand has fingers
-        else if (rightFingers === 5 && leftFingers > 0) {
+        else if (rightFingers === 5 && leftFingers > 1) {
             newRight = 1;
             newLeft = leftFingers - 1;
             splitPerformed = true;
+            handRecovered = true;
         }
         // Case 3: Both hands have fingers, redistribute
         else if (leftFingers > 0 && rightFingers > 0) {
@@ -483,6 +545,11 @@ class ChopsticksGamePro {
             this.gameState.opponent.right = newRight;
             
             this.addLog(`Player 2 split: ${leftFingers}-${rightFingers} → ${newLeft}-${newRight}`, 'opponent-move');
+            
+            // Show recover hand effect if a hand was recovered
+            if (willRecoverHand) {
+                this.createRecoverHandEffect('opponent');
+            }
             
             this.gameState.moveCount++;
             this.updateDisplay();
@@ -619,6 +686,10 @@ class ChopsticksGamePro {
         
         let newLeft, newRight;
         let splitPerformed = false;
+        let handRecovered = false;
+        
+        // Check if this split will recover a dead hand
+        const willRecoverHand = (leftFingers === 5 && rightFingers > 0) || (rightFingers === 5 && leftFingers > 0);
         
         // Computer strategy for splitting
         if (leftFingers === 5 && rightFingers > 0) {
@@ -626,11 +697,13 @@ class ChopsticksGamePro {
             newLeft = 1;
             newRight = rightFingers - 1;
             splitPerformed = true;
+            handRecovered = true;
         } else if (rightFingers === 5 && leftFingers > 0) {
             // Revive dead right hand
             newRight = 1;
             newLeft = leftFingers - 1;
             splitPerformed = true;
+            handRecovered = true;
         } else if ((leftFingers > 0 && rightFingers === 0) || (rightFingers > 0 && leftFingers === 0)) {
             // One hand has all fingers, other is empty
             newLeft = Math.floor(totalFingers / 2);
@@ -657,6 +730,11 @@ class ChopsticksGamePro {
             
             this.addLog(`Computer split: ${leftFingers}-${rightFingers} → ${newLeft}-${newRight}`, 'opponent-move');
             
+            // Show recover hand effect if a hand was recovered
+            if (willRecoverHand) {
+                this.createRecoverHandEffect('opponent');
+            }
+            
             this.gameState.moveCount++;
             this.updateDisplay();
             this.animateFingerChange('opponent', 'left');
@@ -676,7 +754,7 @@ class ChopsticksGamePro {
         const effectsContainer = document.getElementById('game-effects');
         const effect = document.createElement('div');
         effect.className = 'attack-effect';
-        effect.textContent = '✂️';
+        effect.innerHTML = '<i class="fas fa-cut"></i>';
         effectsContainer.appendChild(effect);
         
         // Play split sound
@@ -687,6 +765,44 @@ class ChopsticksGamePro {
         setTimeout(() => {
             effectsContainer.removeChild(effect);
         }, 800);
+    }
+    
+    createRecoverHandEffect(player) {
+        // Find the dead hand that was recovered
+        const handSide = player === 'player' ? 
+            (this.gameState.player.left === 1 && this.gameState.player.right !== 1 ? 'left' : 'right') :
+            (this.gameState.opponent.left === 1 && this.gameState.opponent.right !== 1 ? 'left' : 'right');
+        
+        const handElement = document.getElementById(`${player === 'player' ? 'player' : 'opponent'}-${handSide}`);
+        
+        // Play recover sound
+        if (this.soundManager) {
+            this.soundManager.play('recover');
+        }
+        
+        // Create effect overlay
+        const effectOverlay = document.createElement('div');
+        effectOverlay.className = 'effect-overlay';
+        
+        // Create effect image
+        const effectImg = document.createElement('img');
+        effectImg.src = './effects/recover hand.gif';
+        effectImg.style.width = '100%';
+        effectImg.style.height = '100%';
+        effectImg.style.objectFit = 'cover';
+        effectImg.style.opacity = '0.8';
+        effectImg.style.mixBlendMode = 'screen';
+        
+        // Add image to overlay and overlay to hand
+        effectOverlay.appendChild(effectImg);
+        handElement.appendChild(effectOverlay);
+        
+        // Remove the effect after animation completes
+        setTimeout(() => {
+            if (handElement.contains(effectOverlay)) {
+                handElement.removeChild(effectOverlay);
+            }
+        }, 1500);
     }
 
     checkGameOver() {
@@ -714,9 +830,31 @@ class ChopsticksGamePro {
             this.updateGameStatus('🎉 Player 1 Wins! 🎉');
             this.addLog('🎉 Player 1 is victorious! 🎉', 'game-event');
             
-            // Play win sound
+            // Set result in localStorage and redirect to result page
+            localStorage.setItem('gameResult', 'win');
+            
+            // Play winner sound
             if (this.soundManager) {
-                this.soundManager.play('win');
+                console.log('Playing winner sound...');
+                
+                // Create a direct audio element for more reliable playback
+                const winnerSound = new Audio('./sounds/winner.mp3');
+                winnerSound.volume = 1.0;
+                
+                const playPromise = winnerSound.play();
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => console.log('Winner sound started playing'))
+                        .catch(err => console.error('Error playing winner sound:', err));
+                }
+                
+                setTimeout(() => {
+                    window.location.href = 'game-result.html';
+                }, 2000);
+            } else {
+                setTimeout(() => {
+                    window.location.href = 'game-result.html';
+                }, 1500);
             }
         } else {
             this.stats.playerLosses++;
@@ -725,9 +863,31 @@ class ChopsticksGamePro {
             this.updateGameStatus(`🏆 ${opponentName} Wins! 🏆`);
             this.addLog(`🏆 ${opponentName} is victorious! 🏆`, 'game-event');
             
-            // Play lose sound
+            // Set result in localStorage and redirect to result page
+            localStorage.setItem('gameResult', 'lose');
+            
+            // Play game over sound
             if (this.soundManager) {
-                this.soundManager.play('lose');
+                console.log('Playing game over sound...');
+                
+                // Create a direct audio element for more reliable playback
+                const gameOverSound = new Audio('./sounds/game over.mp3');
+                gameOverSound.volume = 1.0;
+                
+                const playPromise = gameOverSound.play();
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => console.log('Game over sound started playing'))
+                        .catch(err => console.error('Error playing game over sound:', err));
+                }
+                
+                setTimeout(() => {
+                    window.location.href = 'game-result.html';
+                }, 2000);
+            } else {
+                setTimeout(() => {
+                    window.location.href = 'game-result.html';
+                }, 1500);
             }
         }
 
@@ -776,9 +936,18 @@ class ChopsticksGamePro {
             handElement.removeChild(existingOverlay);
         }
 
-        // Update finger display - show individual fingers horizontally
+        // Clear existing fingers
+        fingersElement.innerHTML = '';
+        
         if (fingers === 5) {
-            fingersElement.textContent = this.fingerEmojis[0]; // Dead hand
+            // Don't show any fingers for dead hand
+            fingersElement.innerHTML = '';
+            
+            // Only play sound if the hand wasn't already dead
+            if (!handElement.classList.contains('dead') && this.soundManager) {
+                this.soundManager.play('dead');
+            }
+            
             handElement.classList.add('dead');
             
             // Create effect overlay
@@ -788,12 +957,8 @@ class ChopsticksGamePro {
             // Create effect image with proper path
             const effectImg = document.createElement('img');
             
-            // Use absolute paths to ensure effects load properly
-            if (player === 'opponent') {
-                effectImg.src = './effects/water.gif';
-            } else {
-                effectImg.src = './effects/fire.gif';
-            }
+            // Use dead hand effect for both players when hand is dead
+            effectImg.src = './effects/dead hand.gif';
             
             effectImg.style.width = '100%';
             effectImg.style.height = '100%';
@@ -809,17 +974,22 @@ class ChopsticksGamePro {
             effectImg.onload = () => console.log(`${player} effect loaded successfully`);
             effectImg.onerror = () => console.error(`Failed to load ${player} effect image`);
         } else if (fingers === 0) {
-            fingersElement.textContent = '✊'; // Closed fist for 0
+            // No fingers
             handElement.classList.remove('dead');
         } else {
-            // Display individual fingers horizontally
-            const fingerDisplay = Array(fingers).fill('👆').join(' ');
-            fingersElement.textContent = fingerDisplay;
+            // Add finger elements based on count
+            for (let i = 0; i < fingers; i++) {
+                const fingerElement = document.createElement('div');
+                fingerElement.className = 'finger';
+                fingerElement.textContent = this.fingerEmoji;
+                fingersElement.appendChild(fingerElement);
+            }
+            
             handElement.classList.remove('dead');
         }
 
         // Update count
-        countElement.textContent = fingers === 5 ? '💀' : fingers;
+        countElement.innerHTML = fingers === 5 ? '<i class="fas fa-skull"></i>' : fingers;
     }
 
     updateSplitButton() {
@@ -844,28 +1014,66 @@ class ChopsticksGamePro {
             // Can split if there's more than one finger total and not in the special case
             const canSplit = (leftFingers + rightFingers > 1) && !deadHandWithOneFinger;
             
-            splitBtn1.disabled = !canSplit;
+            // Check if split would actually change anything
+            const total = leftFingers + rightFingers;
+            const newLeft = Math.floor(total / 2);
+            const newRight = total - newLeft;
+            const wouldChange = (leftFingers !== newLeft || rightFingers !== newRight) || 
+                               (leftFingers === 5 || rightFingers === 5); // Always allow split if one hand is dead
+            
+            splitBtn1.disabled = !(canSplit && wouldChange);
+            
+            // Update button appearance based on whether split is possible
+            if (!splitBtn1.disabled) {
+                splitBtn1.classList.add('active-split');
+            } else {
+                splitBtn1.classList.remove('active-split');
+            }
         } else {
             splitBtn1.disabled = true;
+            splitBtn1.classList.remove('active-split');
         }
 
         // Player 2 split button (only in friend mode)
-        if (splitBtn2 && this.gameState.gameMode === 'friend') {
-            if (this.gameState.currentTurn === 'opponent') {
-                const leftFingers = this.gameState.opponent.left;
-                const rightFingers = this.gameState.opponent.right;
-                
-                // Disable split when one hand is dead and the other has exactly 1 finger
-                const deadHandWithOneFinger = (leftFingers === 5 && rightFingers === 1) || 
-                                             (rightFingers === 5 && leftFingers === 1);
-                
-                // Can split if there's more than one finger total and not in the special case
-                const canSplit = (leftFingers + rightFingers > 1) && !deadHandWithOneFinger;
-                
-                splitBtn2.disabled = !canSplit;
-            } else {
-                splitBtn2.disabled = true;
+        if (splitBtn2) {
+            // First ensure proper visibility based on game mode
+            splitBtn2.style.display = this.gameState.gameMode === 'friend' ? 'inline-flex' : 'none';
+            
+            if (this.gameState.gameMode === 'friend') {
+                if (this.gameState.currentTurn === 'opponent') {
+                    const leftFingers = this.gameState.opponent.left;
+                    const rightFingers = this.gameState.opponent.right;
+                    
+                    // Disable split when one hand is dead and the other has exactly 1 finger
+                    const deadHandWithOneFinger = (leftFingers === 5 && rightFingers === 1) || 
+                                                (rightFingers === 5 && leftFingers === 1);
+                    
+                    // Can split if there's more than one finger total and not in the special case
+                    const canSplit = (leftFingers + rightFingers > 1) && !deadHandWithOneFinger;
+                    
+                    // Check if split would actually change anything
+                    const total = leftFingers + rightFingers;
+                    const newLeft = Math.floor(total / 2);
+                    const newRight = total - newLeft;
+                    const wouldChange = (leftFingers !== newLeft || rightFingers !== newRight) || 
+                                    (leftFingers === 5 || rightFingers === 5); // Always allow split if one hand is dead
+                    
+                    splitBtn2.disabled = !(canSplit && wouldChange);
+                    
+                    // Update button appearance based on whether split is possible
+                    if (!splitBtn2.disabled) {
+                        splitBtn2.classList.add('active-split');
+                    } else {
+                        splitBtn2.classList.remove('active-split');
+                    }
+                } else {
+                    splitBtn2.disabled = true;
+                    splitBtn2.classList.remove('active-split');
+                }
             }
+        } else if (splitBtn2) {
+            // Make sure Player 2 split button is hidden in computer mode
+            splitBtn2.style.display = this.gameState.gameMode === 'friend' ? 'inline-flex' : 'none';
         }
     }
 
@@ -913,7 +1121,7 @@ class ChopsticksGamePro {
         const effectsContainer = document.getElementById('game-effects');
         const effect = document.createElement('div');
         effect.className = 'attack-effect';
-        effect.textContent = '💥';
+        effect.innerHTML = '<i class="fas fa-bolt"></i>';
         effectsContainer.appendChild(effect);
         
         // Play attack sound
@@ -928,11 +1136,11 @@ class ChopsticksGamePro {
     
     // Preload effect images to ensure they're available when needed
     preloadEffects() {
-        const waterImg = new Image();
-        waterImg.src = './effects/water.gif';
+        const deadHandImg = new Image();
+        deadHandImg.src = './effects/dead hand.gif';
         
-        const fireImg = new Image();
-        fireImg.src = './effects/fire.gif';
+        const recoverHandImg = new Image();
+        recoverHandImg.src = './effects/recover hand.gif';
         
         console.log('Preloading effect images');
     }
@@ -1021,8 +1229,13 @@ class SoundManager {
             start: 'sounds/start.mp3',
             attack: 'sounds/attack.mp3',
             split: 'sounds/split.mp3',
-            win: 'sounds/win.mp3',
-            lose: 'sounds/lose.mp3'
+            win: 'sounds/winner.mp3',
+            lose: 'sounds/game over.mp3',
+            button: 'sounds/button.wav',
+            touch: 'sounds/touch.wav',
+            dead: 'sounds/dead.wav',
+            recover: 'sounds/recover.wav',
+            hand: 'sounds/hand.wav'
         };
 
         // Load each sound
@@ -1034,6 +1247,19 @@ class SoundManager {
     loadSound(name, path) {
         try {
             const audio = new Audio(path);
+            
+            // Add event listeners for debugging
+            audio.addEventListener('canplaythrough', () => {
+                console.log(`Sound loaded successfully: ${name}`);
+            });
+            
+            audio.addEventListener('error', (e) => {
+                console.error(`Error loading sound: ${name}`, e);
+            });
+            
+            // Preload the audio
+            audio.load();
+            
             this.sounds[name] = audio;
         } catch (error) {
             console.error(`Failed to load sound: ${name}`, error);
@@ -1041,15 +1267,27 @@ class SoundManager {
     }
 
     play(name) {
-        if (!this.enabled || !this.sounds[name]) return;
+        if (!this.enabled || !this.sounds[name]) {
+            console.error(`Sound not available or disabled: ${name}`);
+            return;
+        }
         
         try {
             // Stop and reset the sound if it's already playing
             const sound = this.sounds[name];
             sound.currentTime = 0;
-            sound.play().catch(error => {
-                console.error(`Error playing sound: ${name}`, error);
-            });
+            
+            // Log before playing
+            console.log(`Playing sound: ${name}`);
+            
+            // Play the sound with proper error handling
+            const playPromise = sound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.error(`Error playing sound: ${name}`, error);
+                });
+            }
         } catch (error) {
             console.error(`Error playing sound: ${name}`, error);
         }
@@ -1086,10 +1324,39 @@ document.addEventListener('DOMContentLoaded', () => {
     soundToggleBtn.addEventListener('click', () => {
         const enabled = soundManager.toggle();
         soundToggleBtn.innerHTML = `<i class="fas ${enabled ? 'fa-volume-up' : 'fa-volume-mute'}"></i>`;
-        if (enabled) {
-            soundManager.play('click');
-        }
+        // Don't play sound when toggling sound
     });
     
     headerRight.insertBefore(soundToggleBtn, headerRight.firstChild);
+    
+    // Add touch sound for general page touches
+    document.addEventListener('touchstart', (e) => {
+        // Only play touch sound if the target is not a button or interactive element
+        if (!e.target.closest('button') && 
+            !e.target.closest('a') && 
+            !e.target.closest('.hand') && 
+            !e.target.closest('.player-hand') && 
+            !e.target.closest('.opponent-hand') &&
+            soundManager.isEnabled()) {
+            soundManager.play('touch');
+        }
+    });
+    
+    // Add button sound for all buttons except sound toggle
+    document.querySelectorAll('button:not(.sound-toggle):not(#home-sound-toggle)').forEach(button => {
+        button.addEventListener('click', () => {
+            if (soundManager.isEnabled()) {
+                soundManager.play('button');
+            }
+        });
+    });
+    
+    // Add button sound for links that act as buttons
+    document.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (soundManager.isEnabled()) {
+                soundManager.play('button');
+            }
+        });
+    });
 });

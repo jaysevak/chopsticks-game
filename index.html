@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Chopsticks Game Pro</title>
+    <title>Chopsticks Finger Game</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -36,8 +36,25 @@
             box-shadow: 0 10px 30px var(--shadow);
         }
         
+        .dark-theme .home-container {
+            background: var(--secondary-bg);
+        }
+        
         .game-logo {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            max-width: 100%;
+            height: 400px;
+            background: url('effects/game home page.png') no-repeat center center;
+            background-size: contain;
+            border-radius: 10px;
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3));
+            transition: transform 0.3s ease;
+        }
+        
+
+        
+        .game-logo:hover {
+            transform: scale(1.02);
         }
         
         .game-logo i {
@@ -46,18 +63,63 @@
             margin-bottom: 15px;
         }
         
-        .game-logo h1 {
-            font-size: 3rem;
+        .game-icon {
+            margin-bottom: 15px;
+        }
+        
+        .game-icon i {
+            color: var(--info-color);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .logo-container {
+            position: relative;
+            width: 600px;
+            margin: 0 auto 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .game-logo-img {
+            max-width: 100%;
+            height: auto;
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3));
+            transition: transform 0.3s ease;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .game-logo-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .game-logo h1, .mode-header h1 {
+            font-size: 4rem;
             margin-bottom: 10px;
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         
-        .game-logo p {
+        .game-logo p, .mode-header p {
             color: var(--text-secondary);
             font-size: 1.2rem;
             margin-bottom: 40px;
+        }
+        
+        .mode-header {
+            margin-bottom: 20px;
         }
         
         .menu-buttons {
@@ -99,6 +161,16 @@
         .rules-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(66, 153, 225, 0.3);
+        }
+        
+        .back-btn {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(237, 137, 54, 0.3);
         }
         
         .settings-bar {
@@ -215,6 +287,10 @@
         }
         
         @media (max-width: 600px) {
+            .logo-container {
+                width: 90%;
+            }
+            
             .game-logo h1 {
                 font-size: 2.5rem;
             }
@@ -226,29 +302,46 @@
         }
     </style>
     <script>
+        // Apply theme immediately before page loads
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.className = `${savedTheme}-theme`;
+        })();
+        
         // Always show home screen on page load/refresh
         window.onload = function() {
             document.getElementById('home-screen').style.display = 'flex';
             document.getElementById('mode-screen').style.display = 'none';
+            
+            // Apply saved theme on page load
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.className = `${savedTheme}-theme`;
+            document.documentElement.className = `${savedTheme}-theme`;
+            
+            // Update theme toggle button icon
+            const homeThemeToggle = document.getElementById('home-theme-toggle');
+            if (homeThemeToggle) {
+                homeThemeToggle.innerHTML = `<i class="fas ${savedTheme === 'dark' ? 'fa-sun' : 'fa-moon'}"></i>`;
+            }
+            
+            console.log(`Applied theme on window load: ${savedTheme}`);
         };
     </script>
+    <script src="sound-control.js"></script>
+    <script src="index-script.js"></script>
 </head>
 <body class="light-theme">
     <!-- Home Screen -->
     <div class="home-screen" id="home-screen">
         <div class="home-container">
-            <div class="game-logo">
-                <i class="fas fa-utensils"></i>
-                <h1>Chopsticks Pro</h1>
-                <p>The classic hand game with a modern twist!</p>
-            </div>
+            <div class="game-logo"></div>
 
             <div class="menu-buttons">
                 <button class="menu-btn start-btn" id="start-game">
                     <i class="fas fa-play"></i> Start Game
                 </button>
                 <button class="menu-btn rules-btn" id="show-rules">
-                    <i class="fas fa-book"></i> Game Rules
+                    <i class="fas fa-info-circle"></i> Game Rules
                 </button>
             </div>
 
@@ -262,12 +355,11 @@
             </div>
         </div>
     </div>
-    
-    <!-- Game Mode Selection Screen -->
+
+    <!-- Mode Selection Screen -->
     <div class="mode-screen" id="mode-screen" style="display: none;">
         <div class="home-container">
-            <div class="game-logo">
-                <i class="fas fa-gamepad"></i>
+            <div class="mode-header">
                 <h1>Select Game Mode</h1>
                 <p>Choose how you want to play</p>
             </div>
@@ -279,11 +371,8 @@
                 <button class="menu-btn rules-btn" id="vs-friend-mode">
                     <i class="fas fa-user-friends"></i> Play with Friend
                 </button>
-            </div>
-
-            <div class="settings-bar">
-                <button class="settings-btn" id="back-to-home">
-                    <i class="fas fa-arrow-left"></i>
+                <button class="menu-btn back-btn" id="back-to-home">
+                    <i class="fas fa-arrow-left"></i> Back
                 </button>
             </div>
         </div>
@@ -293,102 +382,37 @@
     <div class="rules-modal" id="rules-modal">
         <div class="rules-content">
             <div class="rules-header">
-                <h2><i class="fas fa-book"></i> Game Rules</h2>
+                <h2>Game Rules</h2>
                 <button class="close-rules" id="close-rules">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="rules-body">
-                <div class="rule-item">
-                    <h3><i class="fas fa-hand-pointer"></i> Basic Gameplay</h3>
-                    <p>Each player starts with 1 finger on each hand. Players take turns tapping an opponent's hand with one of their own hands. When a hand is tapped, the opponent adds the number of fingers on the tapping hand to the tapped hand.</p>
-                </div>
-                <div class="rule-item">
-                    <h3><i class="fas fa-cut"></i> Split Move</h3>
-                    <p>If you have more than one finger total across both hands, you can redistribute your fingers between your hands. You cannot split if you have only one finger total or if one hand is dead and the other has exactly one finger.</p>
-                </div>
-                <div class="rule-item">
-                    <h3><i class="fas fa-skull"></i> Dead Hand</h3>
-                    <p>When a hand reaches exactly 5 fingers, it is considered "dead" and can no longer be used. A hand with 0 fingers is still alive but cannot be used to attack.</p>
-                </div>
-                <div class="rule-item">
-                    <h3><i class="fas fa-trophy"></i> Winning</h3>
-                    <p>A player wins when both of their opponent's hands are dead (have 5 fingers each).</p>
-                </div>
+            <div class="rule-item">
+                <h3><i class="fas fa-play"></i> Basic Rules</h3>
+                <p>Each player starts with 1 finger on each hand. On your turn, you must either attack or split.</p>
+            </div>
+            <div class="rule-item">
+                <h3><i class="fas fa-hand-point-right"></i> Attack</h3>
+                <p>To attack, tap one of your hands, then tap your opponent's hand. The fingers on your hand are added to the fingers on the opponent's hand.</p>
+            </div>
+            <div class="rule-item">
+                <h3><i class="fas fa-cut"></i> Split</h3>
+                <p>If you have fingers on only one hand, or if your hands have an uneven number of fingers, you can redistribute them between your hands.</p>
+            </div>
+            <div class="rule-item">
+                <h3><i class="fas fa-skull"></i> Dead Hand</h3>
+                <p>When a hand reaches exactly 5 fingers, it's "dead" and can't be used. If both your hands are dead, you lose!</p>
+            </div>
+            <div class="rule-item">
+                <h3><i class="fas fa-trophy"></i> Winning</h3>
+                <p>The first player to make both of their opponent's hands dead wins the game!</p>
             </div>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Home screen elements
-            const startGameBtn = document.getElementById('start-game');
-            const showRulesBtn = document.getElementById('show-rules');
-            const homeScreen = document.getElementById('home-screen');
-            const modeScreen = document.getElementById('mode-screen');
-            const rulesModal = document.getElementById('rules-modal');
-            const closeRulesBtn = document.getElementById('close-rules');
-            
-            // Game mode elements
-            const vsComputerBtn = document.getElementById('vs-computer-mode');
-            const vsFriendBtn = document.getElementById('vs-friend-mode');
-            const backToHomeBtn = document.getElementById('back-to-home');
-            
-            // Show game mode selection when Start Game is clicked
-            startGameBtn.addEventListener('click', () => {
-                homeScreen.style.display = 'none';
-                modeScreen.style.display = 'flex';
-            });
-            
-            // Handle mode selection
-            vsComputerBtn.addEventListener('click', () => {
-                // Start game with computer mode
-                localStorage.setItem('gameMode', 'computer');
-                window.location.href = 'game.html';
-            });
-            
-            vsFriendBtn.addEventListener('click', () => {
-                // Start game with friend mode
-                localStorage.setItem('gameMode', 'friend');
-                window.location.href = 'game.html';
-            });
-            
-            // Back button functionality
-            backToHomeBtn.addEventListener('click', () => {
-                modeScreen.style.display = 'none';
-                homeScreen.style.display = 'flex';
-            });
-            
-            // Rules modal functionality
-            showRulesBtn.addEventListener('click', () => {
-                rulesModal.style.display = 'flex';
-            });
-            
-            closeRulesBtn.addEventListener('click', () => {
-                rulesModal.style.display = 'none';
-            });
-            
-            // Theme toggle functionality
-            const homeThemeToggle = document.getElementById('home-theme-toggle');
-            const homeSoundToggle = document.getElementById('home-sound-toggle');
-            
-            homeThemeToggle.addEventListener('click', () => {
-                const currentTheme = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                
-                document.body.className = `${newTheme}-theme`;
-                localStorage.setItem('theme', newTheme);
-                
-                const icon = homeThemeToggle.querySelector('i');
-                icon.className = newTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-            });
-            
-            // Load saved theme
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.body.className = `${savedTheme}-theme`;
-            const themeIcon = homeThemeToggle.querySelector('i');
-            themeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-        });
-    </script>
+    <!-- Home Button (visible during gameplay) -->
+    <button class="home-btn" id="home-btn" style="display: none;">
+        <i class="fas fa-home"></i>
+    </button>
 </body>
 </html>

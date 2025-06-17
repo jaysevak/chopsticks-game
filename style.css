@@ -27,8 +27,9 @@
     --border-color: #4a5568;
     --shadow: rgba(0, 0, 0, 0.3);
     --shadow-hover: rgba(0, 0, 0, 0.4);
-    --gradient-primary: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+    --gradient-primary: linear-gradient(135deg, #3182ce 0%, #63b3ed 100%);
     --gradient-secondary: linear-gradient(135deg, #553c9a 0%, #b83280 100%);
+    --info-color: #63b3ed;
 }
 
 * {
@@ -476,13 +477,21 @@ body {
     min-height: 70px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
     flex-wrap: nowrap;
     gap: 8px;
     flex-direction: row;
     overflow-x: auto;
     padding: 5px;
+    color: var(--info-color);
 }
+
+.finger {
+    display: inline-block;
+    animation: pulse 2s infinite;
+}
+
+
 
 .finger-count {
     font-size: 1.6em;
@@ -497,6 +506,10 @@ body {
     justify-content: center;
     margin: 15px auto 0;
     border: 2px solid var(--border-color);
+}
+
+.finger-count .fa-skull {
+    color: var(--danger-color);
 }
 
 /* Game Board */
@@ -547,6 +560,8 @@ body {
 .split-btn {
     background: var(--success-color);
     color: white;
+    position: relative;
+    overflow: hidden;
 }
 
 .split-btn:hover:not(:disabled) {
@@ -562,15 +577,56 @@ body {
     box-shadow: 0 4px 15px var(--shadow);
 }
 
+.active-split {
+    animation: pulse-split 1.5s infinite;
+}
+
+@keyframes pulse-split {
+    0% {
+        box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(72, 187, 120, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(72, 187, 120, 0);
+    }
+}
+
 .reset-btn {
     background: var(--warning-color);
     color: white;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-weight: bold;
+    transition: all 0.3s ease;
 }
 
 .reset-btn:hover {
     background: #dd6b20;
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(237, 137, 54, 0.4);
+}
+
+.home-btn-link {
+    background: var(--info-color);
+    color: white;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.home-btn-link:hover {
+    background: #3182ce;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(66, 153, 225, 0.4);
+    color: white;
+    text-decoration: none;
 }
 
 .game-effects {
@@ -923,7 +979,7 @@ body {
     }
 }
 
-/* Tablet landscape (4:3) */
+/* Tablet landscape (4:3) - Reset to column layout */
 @media (min-width: 481px) and (max-width: 1024px) and (orientation: landscape) {
     .game-container {
         padding: 15px;
@@ -931,21 +987,20 @@ body {
     
     .game-board {
         display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-around;
+        flex-direction: column;
+        justify-content: space-between;
         align-items: center;
     }
     
     .opponent-section, .player1-section {
-        width: 45%;
-        margin: 10px 0;
+        width: 100%;
+        margin: 15px 0;
     }
     
     .game-status-container {
         width: 100%;
-        order: -1;
-        margin-bottom: 15px;
+        order: 0;
+        margin: 10px 0;
     }
     
     .action-buttons {
@@ -1058,9 +1113,37 @@ body {
     }
 }
 
-@media screen and (orientation: landscape) {
+@media screen and (orientation: landscape) and (max-height: 480px) {
     .game-board {
         flex-direction: row;
         flex-wrap: wrap;
     }
+}
+
+/* Reset layout for laptops but keep phone layout */
+@media screen and (orientation: landscape) and (min-height: 481px) {
+    .game-board {
+        flex-direction: column;
+        flex-wrap: nowrap;
+    }
+    
+    .opponent-section, .player1-section {
+        width: 100%;
+        margin: 20px 0;
+        padding: 25px;
+    }
+    
+    .game-status-container {
+        width: 100%;
+        order: 0;
+        margin: 10px 0;
+        padding: 15px;
+    }
+}
+/* Game mode info text */
+.mode-info-text {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 10px;
+    font-style: italic;
 }

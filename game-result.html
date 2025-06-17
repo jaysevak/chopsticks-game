@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Game Result - Chopsticks Finger Game</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Apply theme immediately before page loads */
+        :root {
+            --confetti-color-1: #f94144;
+            --confetti-color-2: #f3722c;
+            --confetti-color-3: #f8961e;
+            --confetti-color-4: #f9c74f;
+            --confetti-color-5: #90be6d;
+            --confetti-color-6: #43aa8b;
+            --confetti-color-7: #577590;
+        }
+        
+        .result-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-bg);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .result-container {
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--secondary-bg);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px var(--shadow);
+            position: relative;
+            z-index: 10;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .result-icon {
+            font-size: 7rem;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .win-icon {
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+        }
+        
+        .lose-icon {
+            color: var(--danger-color);
+        }
+        
+        .result-title {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+        
+        .win-title {
+            background: linear-gradient(135deg, #ffd700, #ff9d00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .lose-title {
+            background: linear-gradient(135deg, #ff5252, #b33939);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .result-message {
+            color: var(--text-secondary);
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-item {
+            background: var(--accent-bg);
+            padding: 15px 25px;
+            border-radius: 15px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+        
+        .action-btn {
+            padding: 18px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .play-again-btn {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .play-again-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(72, 187, 120, 0.4);
+        }
+        
+        .home-btn {
+            background: var(--info-color);
+            color: white;
+        }
+        
+        .home-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(66, 153, 225, 0.4);
+        }
+        
+        /* Confetti Animation */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--confetti-color-1);
+            opacity: 0;
+            animation: confetti-fall 5s ease-in-out infinite;
+        }
+        
+        @keyframes confetti-fall {
+            0% {
+                opacity: 1;
+                top: -10%;
+                transform: translateX(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0.3;
+                top: 100%;
+                transform: translateX(100px) rotate(360deg);
+            }
+        }
+        
+        /* Rain Animation for Lose Screen */
+        .rain {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background-color: rgba(66, 153, 225, 0.5);
+            opacity: 0;
+            animation: rain-fall 1.5s linear infinite;
+        }
+        
+        @keyframes rain-fall {
+            0% {
+                opacity: 0.7;
+                top: -20px;
+            }
+            100% {
+                opacity: 0.3;
+                top: 100%;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .result-title {
+                font-size: 2.5rem;
+            }
+            
+            .result-icon {
+                font-size: 5rem;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+            
+            .stat-item {
+                width: 80%;
+            }
+        }
+    </style>
+    <script>
+        // Apply theme immediately before page loads
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.className = `${savedTheme}-theme`;
+        })();
+    </script>
+    <script src="sound-control.js"></script>
+</head>
+<body class="light-theme">
+    <div class="result-screen" id="result-screen">
+        <div class="result-container">
+            <div id="result-icon-container">
+                <!-- Icon will be inserted by JavaScript -->
+            </div>
+            <h1 class="result-title" id="result-title">Game Over</h1>
+            <p class="result-message" id="result-message">The game has ended.</p>
+            
+            <div class="stats-container" id="stats-container">
+                <div class="stat-item">
+                    <div class="stat-value" id="games-played">0</div>
+                    <div class="stat-label">Games</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="win-count">0</div>
+                    <div class="stat-label">Wins</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="loss-count">0</div>
+                    <div class="stat-label">Losses</div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn play-again-btn" id="play-again">
+                    <i class="fas fa-redo"></i> Play Again
+                </button>
+                <button class="action-btn home-btn" id="go-home">
+                    <i class="fas fa-home"></i> Back to Home
+                </button>
+            </div>
+        </div>
+        <div id="animation-container"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get game result from localStorage
+            const isWinner = localStorage.getItem('gameResult') === 'win';
+            const gameMode = localStorage.getItem('gameMode') || 'computer';
+            
+            // Get elements
+            const resultIconContainer = document.getElementById('result-icon-container');
+            const resultTitle = document.getElementById('result-title');
+            const resultMessage = document.getElementById('result-message');
+            const playAgainBtn = document.getElementById('play-again');
+            const goHomeBtn = document.getElementById('go-home');
+            const animationContainer = document.getElementById('animation-container');
+            
+            // Get stats
+            let gamesPlayed = parseInt(localStorage.getItem('gamesPlayed') || '0');
+            let winCount = parseInt(localStorage.getItem('winCount') || '0');
+            let lossCount = parseInt(localStorage.getItem('lossCount') || '0');
+            
+            // Update stats
+            gamesPlayed++;
+            if (isWinner) {
+                winCount++;
+            } else {
+                lossCount++;
+            }
+            
+            // Save updated stats
+            localStorage.setItem('gamesPlayed', gamesPlayed.toString());
+            localStorage.setItem('winCount', winCount.toString());
+            localStorage.setItem('lossCount', lossCount.toString());
+            
+            // Update stats display
+            document.getElementById('games-played').textContent = gamesPlayed;
+            document.getElementById('win-count').textContent = winCount;
+            document.getElementById('loss-count').textContent = lossCount;
+            
+            // Set result content based on win/lose
+            if (isWinner) {
+                resultIconContainer.innerHTML = '<i class="fas fa-trophy result-icon win-icon"></i>';
+                resultTitle.textContent = 'Victory!';
+                resultTitle.classList.add('win-title');
+                resultMessage.textContent = gameMode === 'computer' ? 
+                    'Congratulations! You defeated the computer!' : 
+                    'Congratulations! You won the game!';
+                
+                // Create confetti animation
+                createConfetti();
+            } else {
+                resultIconContainer.innerHTML = '<i class="fas fa-cloud-rain result-icon lose-icon"></i>';
+                resultTitle.textContent = 'Defeat';
+                resultTitle.classList.add('lose-title');
+                resultMessage.textContent = gameMode === 'computer' ? 
+                    'The computer has defeated you this time.' : 
+                    'Your opponent has won the game.';
+                
+                // Create rain animation
+                createRain();
+            }
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.className = `${savedTheme}-theme`;
+            document.documentElement.className = `${savedTheme}-theme`;
+            
+            // Sound management
+            const buttonSound = new Audio('./sounds/button.wav');
+            
+            // Function to play sound and then navigate
+            function playAndNavigate(url, delay = 300) {
+                const soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+                if (soundEnabled) {
+                    buttonSound.play().catch(err => console.error('Error playing sound:', err));
+                    setTimeout(() => {
+                        window.location.href = url;
+                    }, delay);
+                } else {
+                    window.location.href = url;
+                }
+            }
+            
+            // Play appropriate sound based on result when page loads
+            const soundEnabled = localStorage.getItem('soundEnabled') !== 'false';
+            if (soundEnabled) {
+                const resultSound = new Audio(isWinner ? './sounds/winner.mp3' : './sounds/game over.mp3');
+                resultSound.volume = 0.5; // Lower volume for background music
+                resultSound.play().catch(err => console.error('Error playing result sound:', err));
+            }
+            
+            // Play Again button
+            playAgainBtn.addEventListener('click', function() {
+                playAndNavigate('game.html');
+            });
+            
+            // Go Home button
+            goHomeBtn.addEventListener('click', function() {
+                playAndNavigate('index.html');
+            });
+            
+            // Function to create confetti animation
+            function createConfetti() {
+                const colors = [
+                    'var(--confetti-color-1)',
+                    'var(--confetti-color-2)',
+                    'var(--confetti-color-3)',
+                    'var(--confetti-color-4)',
+                    'var(--confetti-color-5)',
+                    'var(--confetti-color-6)',
+                    'var(--confetti-color-7)'
+                ];
+                
+                for (let i = 0; i < 100; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = Math.random() * 10 + 5 + 'px';
+                    confetti.style.height = Math.random() * 10 + 5 + 'px';
+                    confetti.style.animationDelay = Math.random() * 5 + 's';
+                    confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+                    
+                    animationContainer.appendChild(confetti);
+                }
+            }
+            
+            // Function to create rain animation
+            function createRain() {
+                for (let i = 0; i < 100; i++) {
+                    const rain = document.createElement('div');
+                    rain.className = 'rain';
+                    rain.style.left = Math.random() * 100 + '%';
+                    rain.style.opacity = Math.random() * 0.4 + 0.1;
+                    rain.style.animationDelay = Math.random() * 2 + 's';
+                    rain.style.animationDuration = Math.random() * 1 + 0.5 + 's';
+                    
+                    animationContainer.appendChild(rain);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

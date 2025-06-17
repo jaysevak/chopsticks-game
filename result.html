@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Game Result - Chopsticks Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .result-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-bg);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+        }
+        
+        .result-container {
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--secondary-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px var(--shadow);
+        }
+        
+        .result-icon {
+            font-size: 6rem;
+            margin-bottom: 20px;
+        }
+        
+        .win-icon {
+            color: var(--success-color);
+        }
+        
+        .lose-icon {
+            color: var(--danger-color);
+        }
+        
+        .result-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .result-message {
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+        
+        .result-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-item {
+            background: var(--accent-bg);
+            padding: 15px 25px;
+            border-radius: 15px;
+            min-width: 100px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .result-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .result-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .play-again-btn {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .play-again-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(72, 187, 120, 0.3);
+        }
+        
+        .home-btn {
+            background: var(--info-color);
+            color: white;
+        }
+        
+        .home-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(66, 153, 225, 0.3);
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: fall 5s ease-in infinite;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .result-title {
+                font-size: 2.5rem;
+            }
+            
+            .result-message {
+                font-size: 1.2rem;
+            }
+            
+            .result-btn {
+                padding: 12px 25px;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body class="light-theme">
+    <!-- Win Screen -->
+    <div class="result-screen" id="win-screen" style="display: none;">
+        <div class="result-container">
+            <div class="result-icon win-icon">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <h1 class="result-title">Victory!</h1>
+            <p class="result-message" id="win-message">Congratulations! You've won the game!</p>
+            
+            <div class="result-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="games-played-win">0</div>
+                    <div class="stat-label">Games</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="player-wins">0</div>
+                    <div class="stat-label">Wins</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="player-losses">0</div>
+                    <div class="stat-label">Losses</div>
+                </div>
+            </div>
+            
+            <div class="result-buttons">
+                <button class="result-btn play-again-btn" id="play-again-win">
+                    <i class="fas fa-redo"></i> Play Again
+                </button>
+                <button class="result-btn home-btn" id="go-home-win">
+                    <i class="fas fa-home"></i> Back to Home
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Lose Screen -->
+    <div class="result-screen" id="lose-screen" style="display: none;">
+        <div class="result-container">
+            <div class="result-icon lose-icon">
+                <i class="fas fa-skull"></i>
+            </div>
+            <h1 class="result-title">Defeat!</h1>
+            <p class="result-message" id="lose-message">You've been defeated! Better luck next time!</p>
+            
+            <div class="result-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="games-played-lose">0</div>
+                    <div class="stat-label">Games</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="player-wins-lose">0</div>
+                    <div class="stat-label">Wins</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="player-losses-lose">0</div>
+                    <div class="stat-label">Losses</div>
+                </div>
+            </div>
+            
+            <div class="result-buttons">
+                <button class="result-btn play-again-btn" id="play-again-lose">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+                <button class="result-btn home-btn" id="go-home-lose">
+                    <i class="fas fa-home"></i> Back to Home
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="sound-control.js"></script>
+    <script>
+        // Sound Manager for the result page
+        class ResultSoundManager {
+            constructor() {
+                this.sounds = {};
+                // Force a boolean value to ensure consistency
+                this.enabled = localStorage.getItem('soundEnabled') === 'true';
+                this.loadSounds();
+                this.setupGlobalSoundEvents();
+            }
+
+            loadSounds() {
+                // Define sounds to load
+                const soundFiles = {
+                    button: 'sounds/button.wav',
+                    touch: 'sounds/touch.wav',
+                    win: 'sounds/winner.mp3',
+                    lose: 'sounds/game over.mp3'
+                };
+
+                // Load each sound
+                for (const [name, path] of Object.entries(soundFiles)) {
+                    this.loadSound(name, path);
+                }
+            }
+
+            loadSound(name, path) {
+                try {
+                    const audio = new Audio(path);
+                    this.sounds[name] = audio;
+                } catch (error) {
+                    console.error(`Failed to load sound: ${name}`, error);
+                }
+            }
+
+            play(name) {
+                if (!this.enabled || !this.sounds[name]) return;
+                
+                try {
+                    // Stop and reset the sound if it's already playing
+                    const sound = this.sounds[name];
+                    sound.currentTime = 0;
+                    sound.play().catch(error => {
+                        console.error(`Error playing sound: ${name}`, error);
+                    });
+                } catch (error) {
+                    console.error(`Error playing sound: ${name}`, error);
+                }
+            }
+
+            isEnabled() {
+                return this.enabled;
+            }
+            
+            toggle() {
+                this.enabled = !this.enabled;
+                // Store as explicit string 'true' or 'false' for consistency
+                localStorage.setItem('soundEnabled', this.enabled ? 'true' : 'false');
+                
+                // Play a test sound if enabling
+                if (this.enabled) {
+                    this.play('button');
+                }
+                
+                return this.enabled;
+            }
+            
+            setupGlobalSoundEvents() {
+                // Add event listener to document for touch/click sounds
+                document.addEventListener('click', (e) => {
+                    // Only play sounds if sound is enabled
+                    if (!this.enabled) return;
+                    
+                    // Check if the clicked element is a button
+                    if (e.target.tagName === 'BUTTON' || 
+                        e.target.closest('button') || 
+                        e.target.classList.contains('result-btn') || 
+                        e.target.closest('.result-btn')) {
+                        this.play('button');
+                    } 
+                    // For any other element that's not a button
+                    else {
+                        this.play('touch');
+                    }
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize sound manager
+            const soundManager = new ResultSoundManager();
+            
+            // Get result type and stats from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const result = urlParams.get('result');
+            const gameMode = urlParams.get('mode') || 'computer';
+            const opponent = gameMode === 'computer' ? 'Computer' : 'Player 2';
+            
+            // Load stats from localStorage
+            const gamesPlayed = parseInt(localStorage.getItem('gamesPlayed') || '0');
+            const playerWins = parseInt(localStorage.getItem('playerWins') || '0');
+            const playerLosses = parseInt(localStorage.getItem('playerLosses') || '0');
+            
+            // Update stats display
+            document.getElementById('games-played-win').textContent = gamesPlayed;
+            document.getElementById('player-wins').textContent = playerWins;
+            document.getElementById('player-losses').textContent = playerLosses;
+            
+            document.getElementById('games-played-lose').textContent = gamesPlayed;
+            document.getElementById('player-wins-lose').textContent = playerWins;
+            document.getElementById('player-losses-lose').textContent = playerLosses;
+            
+            // Show appropriate screen based on result
+            if (result === 'win') {
+                document.getElementById('win-screen').style.display = 'flex';
+                document.getElementById('win-message').textContent = `Congratulations! You've defeated ${opponent}!`;
+                
+                // Play win sound
+                if (soundManager.isEnabled()) {
+                    soundManager.play('win');
+                }
+                
+                // Create confetti effect for win screen
+                createConfetti();
+            } else {
+                document.getElementById('lose-screen').style.display = 'flex';
+                document.getElementById('lose-message').textContent = `You've been defeated by ${opponent}! Better luck next time!`;
+                
+                // Play lose sound
+                if (soundManager.isEnabled()) {
+                    soundManager.play('lose');
+                }
+            }
+            
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.className = `${savedTheme}-theme`;
+            
+            // Add sound toggle button
+            const soundToggleBtn = document.createElement('button');
+            soundToggleBtn.className = 'settings-btn';
+            soundToggleBtn.style.position = 'fixed';
+            soundToggleBtn.style.top = '20px';
+            soundToggleBtn.style.right = '20px';
+            soundToggleBtn.style.zIndex = '3000';
+            soundToggleBtn.innerHTML = `<i class="fas ${soundManager.isEnabled() ? 'fa-volume-up' : 'fa-volume-mute'}"></i>`;
+            document.body.appendChild(soundToggleBtn);
+            
+            // Add sound toggle functionality
+            soundToggleBtn.addEventListener('click', () => {
+                const enabled = soundManager.toggle();
+                soundToggleBtn.innerHTML = `<i class="fas ${enabled ? 'fa-volume-up' : 'fa-volume-mute'}"></i>`;
+            });
+            
+            // Button event listeners
+            document.getElementById('play-again-win').addEventListener('click', () => {
+                if (soundManager.isEnabled()) {
+                    soundManager.play('button');
+                    setTimeout(() => {
+                        window.location.href = 'game.html';
+                    }, 300);
+                } else {
+                    window.location.href = 'game.html';
+                }
+            });
+            
+            document.getElementById('go-home-win').addEventListener('click', () => {
+                if (soundManager.isEnabled()) {
+                    soundManager.play('button');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 300);
+                } else {
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            document.getElementById('play-again-lose').addEventListener('click', () => {
+                if (soundManager.isEnabled()) {
+                    soundManager.play('button');
+                    setTimeout(() => {
+                        window.location.href = 'game.html';
+                    }, 300);
+                } else {
+                    window.location.href = 'game.html';
+                }
+            });
+            
+            document.getElementById('go-home-lose').addEventListener('click', () => {
+                if (soundManager.isEnabled()) {
+                    soundManager.play('button');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 300);
+                } else {
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+        
+        // Confetti effect for win screen
+        function createConfetti() {
+            const confettiContainer = document.getElementById('win-screen');
+            const colors = ['#f94144', '#f3722c', '#f8961e', '#f9c74f', '#90be6d', '#43aa8b', '#577590'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                
+                // Random position
+                const left = Math.random() * 100;
+                
+                // Random color
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Random size
+                const size = Math.random() * 10 + 5;
+                
+                // Random animation delay
+                const delay = Math.random() * 5;
+                
+                // Apply styles
+                confetti.style.left = `${left}%`;
+                confetti.style.backgroundColor = color;
+                confetti.style.width = `${size}px`;
+                confetti.style.height = `${size}px`;
+                confetti.style.animationDelay = `${delay}s`;
+                
+                confettiContainer.appendChild(confetti);
+            }
+        }
+    </script>
+</body>
+</html>

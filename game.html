@@ -23,16 +23,16 @@
                 <button id="sidebar-toggle" class="sidebar-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1>Chopsticks Pro</h1>
+                <h1>Chopsticks Finger Game</h1>
             </div>
             <div class="header-right">
                 <button id="theme-toggle" class="theme-toggle">
                     <i class="fas fa-moon"></i>
                 </button>
-                <button id="reset-btn" class="reset-btn">
+                <button id="reset-btn" class="action-btn reset-btn">
                     <i class="fas fa-redo"></i> Reset
                 </button>
-                <a href="index.html" class="home-link">
+                <a href="index.html" class="action-btn home-btn-link">
                     <i class="fas fa-home"></i> Home
                 </a>
             </div>
@@ -50,11 +50,15 @@
                 </div>
                 <div class="hands-container">
                     <div class="hand opponent-hand" id="opponent-left" data-hand="left">
-                        <div class="fingers" id="opponent-left-fingers">👆</div>
+                        <div class="fingers" id="opponent-left-fingers">
+                            <div class="finger">👆</div>
+                        </div>
                         <div class="finger-count">1</div>
                     </div>
                     <div class="hand opponent-hand" id="opponent-right" data-hand="right">
-                        <div class="fingers" id="opponent-right-fingers">👆</div>
+                        <div class="fingers" id="opponent-right-fingers">
+                            <div class="finger">👆</div>
+                        </div>
                         <div class="finger-count">1</div>
                     </div>
                 </div>
@@ -77,22 +81,26 @@
             </div>
 
             <div class="player-section player1-section">
-                <div class="hands-container">
-                    <div class="hand player-hand" id="player-left" data-hand="left">
-                        <div class="fingers" id="player-left-fingers">👆</div>
-                        <div class="finger-count">1</div>
-                    </div>
-                    <div class="hand player-hand" id="player-right" data-hand="right">
-                        <div class="fingers" id="player-right-fingers">👆</div>
-                        <div class="finger-count">1</div>
-                    </div>
-                </div>
                 <div class="player-info">
                     <div class="player-avatar">
                         <i class="fas fa-user"></i>
                     </div>
                     <div class="player-name">
                         <h2>Player 1</h2>
+                    </div>
+                </div>
+                <div class="hands-container">
+                    <div class="hand player-hand" id="player-left" data-hand="left">
+                        <div class="fingers" id="player-left-fingers">
+                            <div class="finger">👆</div>
+                        </div>
+                        <div class="finger-count">1</div>
+                    </div>
+                    <div class="hand player-hand" id="player-right" data-hand="right">
+                        <div class="fingers" id="player-right-fingers">
+                            <div class="finger">👆</div>
+                        </div>
+                        <div class="finger-count">1</div>
                     </div>
                 </div>
             </div>
@@ -151,13 +159,14 @@
             <div class="game-modes">
                 <h3>Game Mode</h3>
                 <div class="mode-buttons">
-                    <button class="mode-btn active" data-mode="computer">
+                    <button class="mode-btn active" data-mode="computer" disabled>
                         <i class="fas fa-robot"></i> Computer
                     </button>
-                    <button class="mode-btn" data-mode="friend">
+                    <button class="mode-btn" data-mode="friend" disabled>
                         <i class="fas fa-user-friends"></i> Friend
                     </button>
                 </div>
+                <div class="mode-info-text">Game mode cannot be changed during play</div>
             </div>
             <div class="game-logs">
                 <div class="logs-header">
@@ -174,5 +183,7 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="sound-control.js"></script>
+    <script src="sound-toggle.js"></script>
 </body>
 </html>
