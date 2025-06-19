@@ -785,10 +785,10 @@ body {
 /* Portrait orientation (mobile phones, 9:16) */
 @media (max-width: 480px) and (orientation: portrait) {
     .game-container {
+        max-width: 800px;
+        margin: 0 auto;
         padding: 0;
         justify-content: space-between;
-        max-width: 100%;
-        width: 100%;
     }
     
     .game-header {
@@ -797,15 +797,11 @@ body {
     }
     
     .header-left, .header-right {
-        gap: 10px;
+        gap: 20px;
     }
     
     .game-header h1 {
-        font-size: 1.4em;
-    }
-    
-    .home-link {
-        display: none;
+        font-size: 1.8em;
     }
     
     .game-board {
@@ -817,6 +813,8 @@ body {
         padding: 10px;
         margin: 5px 0;
         border-radius: 15px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px var(--shadow);
     }
     
     .hands-container {
@@ -827,12 +825,15 @@ body {
         padding: 15px;
         min-width: 100px;
         border-radius: 15px;
+        border: 2px solid var(--border-color);
+        box-shadow: 0 2px 10px var(--shadow);
     }
     
     .fingers {
         font-size: 1.8em;
         min-height: 50px;
         margin: 10px 0;
+        padding: 2px;
     }
     
     .finger-count {
@@ -840,6 +841,7 @@ body {
         height: 35px;
         font-size: 1.4em;
         margin: 10px auto 0;
+        border: 1px solid var(--border-color);
     }
     
     .player-info {
@@ -850,6 +852,7 @@ body {
         width: 40px;
         height: 40px;
         font-size: 1.2em;
+        border: 2px solid var(--border-color);
     }
     
     .player-info h2 {
@@ -858,6 +861,7 @@ body {
     
     .game-status-container {
         padding: 5px;
+        margin: 2px 0;
     }
     
     .action-btn {
@@ -865,48 +869,45 @@ body {
         font-size: 1em;
         min-width: 120px;
         border-radius: 20px;
+        box-shadow: 0 2px 10px var(--shadow);
     }
     
     .instructions-container {
-        bottom: 10px;
-        right: 10px;
+        bottom: 20px;
+        right: 20px;
     }
     
     .instructions-toggle {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2em;
+        width: 50px;
+        height: 50px;
+        font-size: 1.5em;
+        box-shadow: 0 4px 15px var(--shadow);
     }
     
     .instructions-content {
-        width: 250px;
-        padding: 15px;
-        bottom: 50px;
-    }
-    
-    /* Fix for mobile scrolling */
-    body, html {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
+        width: 300px;
+        padding: 20px;
+        bottom: 60px;
+        box-shadow: 0 8px 25px var(--shadow);
+        border: 1px solid var(--border-color);
     }
 }
 
 /* Landscape orientation (mobile phones, 16:9) */
 @media (max-height: 480px) and (orientation: landscape) {
     .game-container {
+        max-width: 800px;
+        margin: 0 auto;
         padding: 0;
-        max-width: 100%;
     }
     
     .game-header {
-        padding: 5px 10px;
-        height: 50px;
+        padding: 10px 15px;
+        height: 60px;
     }
     
     .game-header h1 {
-        font-size: 1.2em;
+        font-size: 1.8em;
     }
     
     .game-board {
@@ -915,7 +916,7 @@ body {
         justify-content: space-between;
         align-items: center;
         padding: 5px;
-        height: calc(100% - 50px);
+        height: calc(100% - 60px);
     }
     
     .opponent-section, .player1-section {
@@ -923,80 +924,82 @@ body {
         margin: 0;
         padding: 10px;
         border-radius: 15px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px var(--shadow);
     }
     
     .game-status-container {
         width: 20%;
         padding: 5px;
+        margin: 2px 0;
     }
     
     .hands-container {
         flex-direction: row;
-        gap: 15px;
+        gap: 40px;
     }
     
     .hand {
-        padding: 10px;
-        min-width: 80px;
+        padding: 15px;
+        min-width: 100px;
         border-radius: 15px;
+        border: 2px solid var(--border-color);
+        box-shadow: 0 2px 10px var(--shadow);
     }
     
     .fingers {
-        font-size: 1.5em;
-        min-height: 40px;
-        margin: 5px 0;
+        font-size: 1.8em;
+        min-height: 50px;
+        margin: 10px 0;
+        padding: 2px;
     }
     
     .finger-count {
-        width: 30px;
-        height: 30px;
-        font-size: 1.1em;
-        margin: 5px auto 0;
+        width: 35px;
+        height: 35px;
+        font-size: 1.4em;
+        margin: 10px auto 0;
+        border: 1px solid var(--border-color);
     }
     
     .player-info {
-        margin-bottom: 5px;
+        margin-bottom: 10px;
     }
     
     .player-avatar {
-        width: 30px;
-        height: 30px;
-        font-size: 1em;
+        width: 40px;
+        height: 40px;
+        font-size: 1.2em;
+        border: 2px solid var(--border-color);
     }
     
     .player-info h2 {
-        font-size: 1em;
+        font-size: 1.2em;
     }
     
     .action-buttons {
         flex-direction: column;
-        gap: 5px;
+        gap: 10px;
     }
     
     .action-btn {
-        padding: 8px 15px;
-        font-size: 0.9em;
-        min-width: 100px;
-        border-radius: 15px;
+        padding: 10px 20px;
+        font-size: 1em;
+        min-width: 120px;
+        border-radius: 20px;
+        box-shadow: 0 2px 10px var(--shadow);
     }
     
     .instructions-container {
-        bottom: 5px;
-        right: 5px;
+        bottom: 20px;
+        right: 20px;
     }
     
     .instructions-toggle {
-        width: 35px;
-        height: 35px;
-        font-size: 1em;
-    }
-    
-    /* Fix for mobile scrolling in landscape */
-    body, html {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
+        width: 50px;
+        height: 50px;
+        font-size: 1.5em;
+        box-shadow: 0 4px 15px var(--shadow);
     }
 }
 
