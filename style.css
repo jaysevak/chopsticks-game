@@ -329,13 +329,11 @@ body {
 .game-container {
     max-width: 800px;
     margin: 0 auto;
-    padding: 0;
-    height: 100vh; /* Fallback */
-    height: calc(var(--vh, 1vh) * 100);
+    padding: 30px 20px;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     width: 100%;
-    overflow: hidden;
     position: relative;
 }
 
@@ -528,15 +526,13 @@ body {
 /* Game Board */
 .game-board {
     margin: 0;
-    padding: 5px;
+    padding: 20px;
     text-align: center;
     position: relative;
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    overflow: hidden;
-    height: calc(100% - 60px); /* Subtract header height */
 }
 
 .game-status-container {
@@ -785,56 +781,45 @@ body {
 /* Portrait orientation (mobile phones, 9:16) */
 @media (max-width: 480px) and (orientation: portrait) {
     .game-container {
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
-        justify-content: space-between;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 30px 20px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
     }
     
     .game-header {
-        padding: 8px 10px;
-        height: 55px;
+        padding: 15px 20px;
     }
     
     .header-left, .header-right {
-        gap: 8px;
+        gap: 15px;
     }
     
     .game-header h1 {
-        font-size: 1.2em;
-        white-space: nowrap;
-    }
-    
-    .home-btn-link {
-        display: inline-flex !important;
-        padding: 6px 12px;
-        font-size: 0.8em;
-        min-width: auto;
-    }
-    
-    .reset-btn {
-        padding: 6px 12px;
-        font-size: 0.8em;
-        min-width: auto;
-    }
-    
-    .theme-toggle, .sound-toggle {
-        width: 35px;
-        height: 35px;
-        font-size: 1em;
+        font-size: 1.8em;
     }
     
     .game-board {
-        padding: 5px;
-        height: calc(100% - 55px);
+        margin: 0;
+        padding: 20px;
+        text-align: center;
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
     
     .player-section {
-        padding: 10px;
-        margin: 5px 0;
-        border-radius: 15px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 4px 15px var(--shadow);
+        margin: 30px 0;
+        padding: 25px;
+        border-radius: 20px;
+        background: var(--secondary-bg);
+        border: 2px solid var(--border-color);
+        box-shadow: 0 8px 25px var(--shadow);
+        transition: all 0.3s ease;
     }
     
     .hands-container {
@@ -842,54 +827,87 @@ body {
     }
     
     .hand {
-        padding: 15px;
-        min-width: 100px;
-        border-radius: 15px;
-        border: 2px solid var(--border-color);
-        box-shadow: 0 2px 10px var(--shadow);
+        background: var(--secondary-bg);
+        border: 3px solid var(--border-color);
+        border-radius: 20px;
+        padding: 25px;
+        min-width: 140px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        box-shadow: 0 4px 15px var(--shadow);
     }
     
     .fingers {
-        font-size: 1.8em;
-        min-height: 50px;
-        margin: 10px 0;
-        padding: 2px;
+        font-size: 2.2em;
+        margin: 15px 0;
+        min-height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        flex-wrap: nowrap;
+        gap: 8px;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 5px;
+        color: var(--info-color);
     }
     
     .finger-count {
-        width: 35px;
-        height: 35px;
-        font-size: 1.4em;
-        margin: 10px auto 0;
-        border: 1px solid var(--border-color);
+        font-size: 1.6em;
+        font-weight: bold;
+        color: var(--text-primary);
+        background: var(--accent-bg);
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 15px auto 0;
+        border: 2px solid var(--border-color);
     }
     
     .player-info {
-        margin-bottom: 10px;
+        margin-bottom: 20px;
     }
     
     .player-avatar {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2em;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--accent-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5em;
+        color: var(--text-secondary);
         border: 2px solid var(--border-color);
     }
     
     .player-info h2 {
-        font-size: 1.2em;
+        font-size: 1.4em;
     }
     
     .game-status-container {
-        padding: 5px;
-        margin: 2px 0;
+        padding: 15px;
+        margin: 10px 0;
     }
     
     .action-btn {
-        padding: 10px 20px;
-        font-size: 1em;
-        min-width: 120px;
-        border-radius: 20px;
-        box-shadow: 0 2px 10px var(--shadow);
+        padding: 15px 30px;
+        border: none;
+        border-radius: 30px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        min-width: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 4px 15px var(--shadow);
     }
     
     .instructions-container {
@@ -900,58 +918,42 @@ body {
     .instructions-toggle {
         width: 50px;
         height: 50px;
+        border-radius: 50%;
+        background: var(--info-color);
+        color: white;
+        border: none;
         font-size: 1.5em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         box-shadow: 0 4px 15px var(--shadow);
+        transition: all 0.3s ease;
     }
     
     .instructions-content {
         width: 300px;
+        background: var(--secondary-bg);
+        border-radius: 15px;
         padding: 20px;
-        bottom: 60px;
         box-shadow: 0 8px 25px var(--shadow);
         border: 1px solid var(--border-color);
+        bottom: 60px;
     }
 }
 
 /* Landscape orientation (mobile phones, 16:9) */
 @media (max-height: 480px) and (orientation: landscape) {
     .game-container {
-        max-width: 100%;
-        margin: 0;
-        padding: 0;
+        padding: 5px;
     }
     
     .game-header {
-        padding: 5px 8px;
-        height: 45px;
+        padding: 5px 10px;
     }
     
     .game-header h1 {
-        font-size: 1em;
-        white-space: nowrap;
-    }
-    
-    .header-left, .header-right {
-        gap: 5px;
-    }
-    
-    .home-btn-link {
-        display: inline-flex !important;
-        padding: 4px 8px;
-        font-size: 0.7em;
-        min-width: auto;
-    }
-    
-    .reset-btn {
-        padding: 4px 8px;
-        font-size: 0.7em;
-        min-width: auto;
-    }
-    
-    .theme-toggle, .sound-toggle {
-        width: 30px;
-        height: 30px;
-        font-size: 0.9em;
+        font-size: 1.2em;
     }
     
     .game-board {
@@ -959,91 +961,77 @@ body {
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        padding: 3px;
-        height: calc(100% - 45px);
+        padding: 5px;
     }
     
     .opponent-section, .player1-section {
         width: 40%;
         margin: 0;
         padding: 10px;
-        border-radius: 15px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 4px 15px var(--shadow);
     }
     
     .game-status-container {
         width: 20%;
         padding: 5px;
-        margin: 2px 0;
     }
     
     .hands-container {
         flex-direction: row;
-        gap: 40px;
+        gap: 10px;
     }
     
     .hand {
-        padding: 15px;
-        min-width: 100px;
-        border-radius: 15px;
-        border: 2px solid var(--border-color);
-        box-shadow: 0 2px 10px var(--shadow);
+        padding: 10px;
+        min-width: 80px;
     }
     
     .fingers {
-        font-size: 1.8em;
-        min-height: 50px;
-        margin: 10px 0;
-        padding: 2px;
+        font-size: 1.5em;
+        min-height: 40px;
+        margin: 5px 0;
     }
     
     .finger-count {
-        width: 35px;
-        height: 35px;
-        font-size: 1.4em;
-        margin: 10px auto 0;
-        border: 1px solid var(--border-color);
+        width: 30px;
+        height: 30px;
+        font-size: 1.1em;
+        margin: 5px auto 0;
     }
     
     .player-info {
-        margin-bottom: 10px;
+        margin-bottom: 5px;
     }
     
     .player-avatar {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2em;
-        border: 2px solid var(--border-color);
+        width: 30px;
+        height: 30px;
+        font-size: 1em;
     }
     
     .player-info h2 {
-        font-size: 1.2em;
+        font-size: 1em;
     }
     
     .action-buttons {
         flex-direction: column;
-        gap: 10px;
+        gap: 5px;
     }
     
     .action-btn {
-        padding: 10px 20px;
-        font-size: 1em;
-        min-width: 120px;
-        border-radius: 20px;
-        box-shadow: 0 2px 10px var(--shadow);
+        padding: 8px 15px;
+        font-size: 0.9em;
+        min-width: 100px;
     }
     
     .instructions-container {
-        bottom: 20px;
-        right: 20px;
+        bottom: 5px;
+        right: 5px;
     }
     
     .instructions-toggle {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5em;
-        box-shadow: 0 4px 15px var(--shadow);
+        width: 35px;
+        height: 35px;
+        font-size: 1em;
     }
 }
 
@@ -1238,9 +1226,6 @@ body {
 /* Fix for iOS Safari and other mobile browsers */
 html, body {
     height: 100%;
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
     margin: 0;
     padding: 0;
 }
